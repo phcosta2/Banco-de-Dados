@@ -3,7 +3,9 @@
 
 # Integrantes
 João Vitor Governatore R.A.: 24.122.027-6
+
 Felipe Orlando Lanzara R.A.: 24.122.055-7
+
 Pedro Henrique Lega Kramer Costa R.A.: 24.122.049-0
 
 # Diagrama Relacional(MER)
