@@ -1,6 +1,7 @@
 import psycopg2
 import json
-
+from faker import Faker
+from faker.providers import DynamicProvider
 
 with open('acess.json') as file:
     config = json.load(file)
@@ -25,6 +26,40 @@ cursor.execute(sql_script)
 
 # Commit the changes (if necessary)
 conexao.commit()
+
+
+
+#Criação dos dados nas tabelas:
+
+
+
+# Crie uma instância do Faker em pt-br
+fake = Faker('pt-br')
+# Gerar um nome de departamento aleatorio
+nome_departamento = DynamicProvider(
+     provider_name="dept_name",
+     elements=["Ciência da Computação", "Engenharia Elétrica", "Engenharia Mecãnica", "Engenharia Química", "Administração"],
+)
+
+#inicialização dos providers:
+
+fake.add_provider(nome_departamento)
+
+
+#tabela departamento:
+cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", (fake.dept_name(),fake.first_name()))
+
+
+
+
+
+
+
+
+#escrever os dados na tabela:
+conexao.commit()
+
+
 
 # Close the cursor and the connection
 cursor.close()
