@@ -1,0 +1,8 @@
+{
+    "database": "<nome do sevidor>",
+    "user": "<usuario do servidor>", 
+    "password":"<senha gerada pelo DB>", 
+    "host": "<endereçamento do BD>",
+    "port":"<porta do BD>" 
+
+}
