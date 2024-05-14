@@ -1,31 +1,29 @@
 CREATE TABLE IF NOT EXISTS Departamento(
-    nome_departamento varchar(30) PRIMARY KEY,
-    chefe_departamento varchar(20)
+    nome_departamento varchar(50) PRIMARY KEY,
+    chefe_departamento varchar(50)
 );
 
 CREATE TABLE IF NOT EXISTS Professor(
     id_professor varchar(12) PRIMARY KEY,
-
-    nome_professor varchar(20),
-
+    nome_professor varchar(50),
     salario FLOAT DEFAULT 0,
-
-    nome_departamento varchar(30) REFERENCES Departamento(nome_departamento)
-);
-
-CREATE TABLE IF NOT EXISTS Curso(
-    id_curso varchar(2) PRIMARY KEY,
-    nome_curso varchar(30),
-    horas_extras numeric(3),
-    nome_departamento varchar(30) REFERENCES Departamento(nome_departamento)
+    nome_departamento varchar(50) REFERENCES Departamento(nome_departamento)
 );
 
 CREATE TABLE IF NOT EXISTS Materia(
     id_materia varchar(6) PRIMARY KEY,
-    nome_materia varchar(40),
-    prova varchar(15),
+    nome_materia varchar(50),
+    prova varchar(30),
     id_professor varchar(12) REFERENCES Professor(id_professor),
-    nome_departamento varchar(30) REFERENCES Departamento(nome_departamento)
+    nome_departamento varchar(50) REFERENCES Departamento(nome_departamento)
+);
+
+CREATE TABLE IF NOT EXISTS Curso(
+    id_curso varchar(2) PRIMARY KEY,
+    nome_curso varchar(50),
+    horas_extras numeric(3),
+    nome_departamento varchar(50) REFERENCES Departamento(nome_departamento),
+    id_materia varchar(6) REFERENCES Materia(id_materia)
 );
 
 CREATE TABLE IF NOT EXISTS Matriz_Curricular(
@@ -38,29 +36,39 @@ CREATE TABLE IF NOT EXISTS Matriz_Curricular(
 
 CREATE TABLE IF NOT EXISTS Tcc (
     id_tcc varchar(14) PRIMARY KEY,
-    titulo varchar(40) NOT NULL,
+    titulo varchar(90) NOT NULL,
     id_professor varchar(12) REFERENCES Professor(id_professor)
 );
 
 CREATE TABLE IF NOT EXISTS Aluno(
     id_aluno varchar(12) PRIMARY KEY,
-    nome_aluno varchar(20),
+    nome_aluno varchar(50),
     idade_aluno numeric(3),
     id_curso varchar(2) REFERENCES Curso(id_curso),
     id_tcc varchar(14) REFERENCES Tcc(id_tcc)
 );
 
 CREATE TABLE IF NOT EXISTS Horas_Complementares(
-    id_horas varchar(3) PRIMARY KEY,
+    id_horas varchar(3), --*
     descricao varchar(80),
     horas_extras numeric(3),
-    id_aluno varchar(20) REFERENCES Aluno(id_aluno)
+    id_aluno varchar(12) REFERENCES Aluno(id_aluno)
 );
 
 CREATE TABLE IF NOT EXISTS Historico_Escolar(
-    id_historico varchar(12) PRIMARY KEY,
+    id_historico_escolar varchar(12) PRIMARY KEY,
     nota numeric(2),
     semestre varchar(15),
-    id_aluno varchar(20) REFERENCES Aluno(id_aluno),
+    ano varchar(4),
+    id_aluno varchar(12) REFERENCES Aluno(id_aluno),
+    id_materia varchar(6) REFERENCES Materia(id_materia)
+);
+
+CREATE TABLE IF NOT EXISTS Historico_Professor(
+    id_historico_professor varchar(12) PRIMARY KEY,
+    semestre varchar(15),
+    ano numeric(4),
+    quantidade_aulas numeric(4),
+    id_professor varchar(12) REFERENCES Professor(id_professor),
     id_materia varchar(6) REFERENCES Materia(id_materia)
 );
