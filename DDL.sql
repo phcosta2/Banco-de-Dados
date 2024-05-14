@@ -10,14 +10,14 @@ CREATE TABLE IF NOT EXISTS Departamento(
 CREATE TABLE IF NOT EXISTS Professor(
     id_professor varchar(12) PRIMARY KEY,
     nome_professor varchar(50),
-    salario FLOAT DEFAULT 0,
+    salario numeric DEFAULT 0,
     nome_departamento varchar(50) REFERENCES Departamento(nome_departamento)
 );
 
 CREATE TABLE IF NOT EXISTS Materia(
     id_materia varchar(6) PRIMARY KEY,
     nome_materia varchar(50),
-    prova varchar(30),
+    prova boolean,
     id_professor varchar(12) REFERENCES Professor(id_professor),
     nome_departamento varchar(50) REFERENCES Departamento(nome_departamento)
 );
