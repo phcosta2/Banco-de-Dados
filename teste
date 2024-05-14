@@ -1,8 +1,0 @@
-with open("DDL.sql", "r") as sql_file:
-    sql_script = sql_file.read()
-
-# Execute the SQL script
-cursor.execute(sql_script)
-
-# Commit the changes (if necessary)
-conexao.commit()
