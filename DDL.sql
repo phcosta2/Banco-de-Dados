@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS projeto;
+
+CREATE DATABASE projeto;
+
 CREATE TABLE IF NOT EXISTS Departamento(
     nome_departamento varchar(50) PRIMARY KEY,
     chefe_departamento varchar(50)

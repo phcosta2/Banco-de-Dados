@@ -24,13 +24,8 @@ with open("DDL.sql", "r") as sql_file:
 # Execute the SQL script
 cursor.execute(sql_script)
 
-# Commit the changes (if necessary)
-conexao.commit()
-
-
 
 #Criação dos dados nas tabelas:
-
 
 
 # Crie uma instância do Faker em pt-br
@@ -58,14 +53,6 @@ cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", (fake.dept_name(),fak
 
 #escrever os dados na tabela:
 conexao.commit()
-
-
-
-# Close the cursor and the connection
-cursor.close()
-conexao.close()
-
-
 
 
 # Arrumar a quantidade de caracteres dentro do varchar
