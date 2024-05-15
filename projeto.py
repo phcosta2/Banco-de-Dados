@@ -48,7 +48,7 @@ primary_keys = {
     "id_professor" : ["12.244.524-8", "12.244.785-4", "12.244.132-8", "12.244.512-4", "12.244.654-7", "12.244.368-2", "12.244.524-3", "12.244.952-4", "12.244.714-2", "12.244.518-4"],
     "id_aluno" : ['24.122.055-7', '24.122.027-6', '24.122.049-9','24.122.011-2','24.122.024-4','24.122.088-8','24.122.088-2', '24.122.099-9','24.122.011-1','24.122.000-1'],
     "id_curso" : ['MA', 'FI', 'CC', 'EE', 'EM', 'EQ', 'AD', 'EP', 'EN', 'ET'],
-    "id_materia" : ['CC2645', 'MA5234', 'CC8452', 'FI3254', 'CC8475', 'EQ2147', 'EQ6352', 'ET8756', 'AD7832', 'MA1253']
+    "id_materia" : ['MA2645', 'FI5234', 'CC8452', 'EE3254', 'EM8475', 'EQ2147', 'AD6352', 'EP8756', 'EN7832', 'ET1253']
     
 }
 
@@ -69,15 +69,61 @@ for linha in range(len(primary_keys["id_professor"])):
 for linha in range(len(primary_keys["id_materia"])):
     cursor.execute("INSERT INTO MATERIA VALUES (%s, %s, %s,%s)", (primary_keys["id_materia"][linha], fake.materias(), fake.pybool(),random.choice(primary_keys["id_professor"])))
 
-# Atualizar a tabela de matérias com o departamento baseado no id do prof
+
+
+#Criação da Tabela Curso:
+for linha in range(len(primary_keys["id_curso"])):
+    cursor.execute("INSERT INTO CURSO VALUES (%s, %s, %s)", (primary_keys["id_curso"][linha] , "AAA", random.randint(100,300)))
+
+
+#Criação das tabelas do TCC:
+
+for linha in range(10):
+    cursor.execute("INSERT INTO TCC VALUES (%s, %s, %s)", (linha, ('Titulo ',linha),random.choice(primary_keys["id_professor"])))
+
+
+#Criação das tabelas do Aluno:
+
+for linha in range(len(primary_keys["id_aluno"])):
+    cursor.execute("INSERT INTO ALUNO VALUES (%s, %s, %s)", (primary_keys["id_aluno"][linha], fake.first_name(),random.randint(18,65)))
+
+
+
+#Escrever o nome de departamento da tabela professor
 
 cursor.execute("SELECT id_professor, nome_departamento FROM PROFESSOR")
-professores = cursor.fetchall()
+professores = cursor.fetchall() #criar tupla com todos os dados da tabela
+
+
+# Atualizar a tabela de matérias com o departamento baseado no id do prof
 for professor in professores:
     id_professor = professor[0]
     departamento_professor = professor[1]
     cursor.execute("UPDATE MATERIA SET nome_departamento = %s WHERE id_professor = %s", (departamento_professor, id_professor))
 
+#Atualizar a tabela curso com departamento, nome e id
+
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Matemática' WHERE id_curso = 'MA'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Física' WHERE id_curso = 'FI'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Ciência da Computação' WHERE id_curso = 'CC'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Engenharia Elétrica' WHERE id_curso = 'EE'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Engenharia Mecânica' WHERE id_curso = 'EM'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Engenharia Química' WHERE id_curso = 'EQ'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Administração' WHERE id_curso = 'AD'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Engenharia de Produção' WHERE id_curso = 'EP'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Engenharia Nuclear' WHERE id_curso = 'EN'")
+cursor.execute("UPDATE CURSO SET nome_departamento = 'Engenharia Textil' WHERE id_curso = 'ET'")
+
+
+'''
+cursor.execute("SELECT id_materia, nome_departamento FROM MATERIA")
+materias = cursor.fetchall() #criar tupla com todos os dados da tabela
+for element in materias:
+    print (element)
+    id_mat = element[0]
+    departamento_materia = element[1]
+    cursor.execute("UPDATE CURSO SET id_materia = %s WHERE nome_departamento = %s", (id_mat, departamento_materia))
+'''
 
 #escrever os dados na tabela:
 conexao.commit()
