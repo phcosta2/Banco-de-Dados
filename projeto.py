@@ -67,15 +67,22 @@ for linha in range(len(primary_keys["id_professor"])):
 #Criação das tabelas da Materia:
 
 for linha in range(len(primary_keys["id_materia"])):
-    cursor.execute("INSERT INTO MATERIA VALUES (%s, %s, %s,%s,%s)", (primary_keys["id_materia"][linha], fake.materias(), fake.pybool(),random.choice(primary_keys["id_professor"]),random.choice(primary_keys["nome_departamento"])))
+    cursor.execute("INSERT INTO MATERIA VALUES (%s, %s, %s,%s)", (primary_keys["id_materia"][linha], fake.materias(), fake.pybool(),random.choice(primary_keys["id_professor"])))
 
+# Atualizar a tabela de matérias com o departamento baseado no id do prof
+
+cursor.execute("SELECT id_professor, nome_departamento FROM PROFESSOR")
+professores = cursor.fetchall()
+for professor in professores:
+    id_professor = professor[0]
+    departamento_professor = professor[1]
+    cursor.execute("UPDATE MATERIA SET nome_departamento = %s WHERE id_professor = %s", (departamento_professor, id_professor))
 
 
 #escrever os dados na tabela:
 conexao.commit()
 
 
-# Arrumar a quantidade de caracteres dentro do varchar
-# Remover o ID horas de chave primária em horas complementares (ele pode ser repetido)
-# Perguntar se pode utilizar o python para inserir dados
-# Perguntar sobre os dados null
+# Fechar o cursor e a conexão
+cursor.close()
+conexao.close()
