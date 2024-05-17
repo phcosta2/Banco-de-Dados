@@ -48,8 +48,8 @@ primary_keys = {
     "id_professor" : ["12.244.524-8", "12.244.785-4", "12.244.132-8", "12.244.512-4", "12.244.654-7", "12.244.368-2", "12.244.524-3", "12.244.952-4", "12.244.714-2", "12.244.518-4"],
     "id_aluno" : ['24.122.055-7', '24.122.027-6', '24.122.049-9','24.122.011-2','24.122.024-4','24.122.088-8','24.122.088-2', '24.122.099-9','24.122.011-1','24.122.000-1'],
     "id_curso" : ['MA', 'FI', 'CC', 'EE', 'EM', 'EQ', 'AD', 'EP', 'EN', 'ET'],
-    "id_materia" : ['MA2645', 'FI5234', 'CC8452', 'EE3254', 'EM8475', 'EQ2147', 'AD6352', 'EP8756', 'EN7832', 'ET1253']
-    
+    "id_materia" : ['MA2645', 'FI5234', 'CC8452', 'EE3254', 'EM8475', 'EQ2147', 'AD6352', 'EP8756', 'EN7832', 'ET1253'],
+    "semestre" : ['Primeiro','Segundo','Terceiro','Quarto','Quinto','Sexto','Sétimo','Oitavo','Nono','Décimo']
 }
 
 
@@ -73,13 +73,13 @@ for linha in range(len(primary_keys["id_materia"])):
 
 #Criação da Tabela Curso:
 for linha in range(len(primary_keys["id_curso"])):
-    cursor.execute("INSERT INTO CURSO VALUES (%s, %s, %s)", (primary_keys["id_curso"][linha] , "AAA", random.randint(100,300)))
+    cursor.execute("INSERT INTO CURSO VALUES (%s, %s, %s)", (primary_keys["id_curso"][linha] , "AAA", random.randint(160,300)))
 
 
 #Criação das tabelas do TCC:
 
 for linha in range(10):
-    cursor.execute("INSERT INTO TCC VALUES (%s, %s, %s)", (linha, ('Titulo ',linha),random.choice(primary_keys["id_professor"])))
+    cursor.execute("INSERT INTO TCC (titulo,id_professor) VALUES (%s,%s)", ("Título",random.choice(primary_keys['id_professor'])))
 
 
 #Criação das tabelas do Aluno:
@@ -87,7 +87,11 @@ for linha in range(10):
 for linha in range(len(primary_keys["id_aluno"])):
     cursor.execute("INSERT INTO ALUNO VALUES (%s, %s, %s)", (primary_keys["id_aluno"][linha], fake.first_name(),random.randint(18,65)))
 
+#Criação fas tabelas Histórico Escolar
 
+
+for linha in range(10):
+    cursor.execute("INSERT INTO HISTORICO_ESCOLAR (nota,semestre,ano,id_aluno,id_materia) VALUES(%s,%s,%s,%s,%s)", (random.randint(0,10),random.choice(primary_keys["semestre"]),random.randint(2000,2030),primary_keys["id_aluno"][linha],primary_keys["id_materia"][linha]))
 
 #Escrever o nome de departamento da tabela professor
 
@@ -128,7 +132,3 @@ for element in materias:
 #escrever os dados na tabela:
 conexao.commit()
 
-
-# Fechar o cursor e a conexão
-cursor.close()
-conexao.close()

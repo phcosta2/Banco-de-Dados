@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Matriz_Curricular(
     id_curso varchar(2) REFERENCES Curso(id_curso)
 );
 
-CREATE SEQUENCE sequencia_tcc START 1;
+CREATE SEQUENCE sequencia_tcc START 1;  
 CREATE TABLE IF NOT EXISTS Tcc (
     id_tcc numeric(6) DEFAULT nextval ('sequencia_tcc') PRIMARY KEY,
     titulo varchar(90) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS Historico_Escolar(
     id_historico_escolar numeric(6) DEFAULT nextval ('sequencia_historico_escolar') PRIMARY KEY,
     nota numeric(2),
     semestre varchar(15),
-    ano varchar(4),
+    ano numeric(4),
     id_aluno varchar(12) REFERENCES Aluno(id_aluno),
     id_materia varchar(6) REFERENCES Materia(id_materia)
 );
