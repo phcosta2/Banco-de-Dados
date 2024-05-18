@@ -77,5 +77,5 @@ CREATE TABLE IF NOT EXISTS Historico_Professor(
     ano numeric(4),
     quantidade_aulas numeric(4),
     id_professor varchar(12) REFERENCES Professor(id_professor),
-    id_materia varchar(6) REFERENCES Materia(id_materia)
+    id_materia_atual varchar(6) REFERENCES Materia(id_materia)
 );
