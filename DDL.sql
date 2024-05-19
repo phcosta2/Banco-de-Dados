@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Aluno(
 
 CREATE TABLE IF NOT EXISTS Horas_Complementares(
     id_horas varchar(3), --*
-    descricao varchar(80),
+    descricao varchar(220),
     horas_extras numeric(3),
     id_aluno varchar(12) REFERENCES Aluno(id_aluno)
 );
@@ -74,5 +74,5 @@ CREATE TABLE IF NOT EXISTS Historico_Professor(
     ano numeric(4),
     quantidade_aulas numeric(4),
     id_professor varchar(12) REFERENCES Professor(id_professor),
-    id_materia_atual varchar(6) REFERENCES Materia(id_materia)
+    id_materia varchar(6) REFERENCES Materia(id_materia)
 );
