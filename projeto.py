@@ -30,7 +30,7 @@ cursor.execute(sql_script)
 
 #Criação dos dados nas tabelas:
 
-
+print('Leitura de dados')
 ##criacao da instancia do Faker para pt-br
 fake = Faker('pt-br')
 
@@ -79,7 +79,7 @@ for id in aux_ids_prof:
     id = id[0:2] + '.' + id[2:5] + '.' + id[5:8] + '-' + id[8]
     ids_prof.append(id)
 
-
+print('inicialização das listas')
 # # Geracao de semestres do historico escolar de maneira aleatoria
 # semestre = DynamicProvider(
 #     provider_name="historico_escolar",
@@ -141,10 +141,9 @@ for linha in range(len(primary_keys["id_curso"])):
     cursor.execute("INSERT INTO CURSO VALUES (%s, %s, %s)", (primary_keys["id_curso"][linha] ,'Null', random.randint(160,300)))
 
 
-#Criação da tabela Matriz Curricular -  MATRIZ CURRICULAR E MATERIA PRECISA ARRUMAR, ELES PRECISAM ESTAR NO MESMO DEPARTAMENTO, O QUE NAO ESTA ACONTECENDO DEVIDO A GERACAO DE IDS DE MANEIRA ALEATORIA
-for linha in range(len(primary_keys["nome_departamento"])): 
-    for i in range(len(primary_keys["id_materia"])):
-        cursor.execute("INSERT INTO MATRIZ_CURRICULAR VALUES (%s,%s, %s)", (primary_keys["nome_departamento"][linha], primary_keys["id_curso"][linha], lista_materias[linha]))
+#Criação da tabela Matriz Curricular
+for materia in lista_materias:
+    cursor.execute("INSERT INTO MATRIZ_CURRICULAR (id_materia) VALUES (%s)", (str(materia),))
 
 
 #Criação das tabelas do TCC: - precisa colocar titulos decentes
@@ -180,6 +179,31 @@ for professor in professores:
     id_professor = professor[0]
     departamento_professor = professor[1]
     cursor.execute("UPDATE MATERIA SET nome_departamento = %s WHERE id_professor = %s", (departamento_professor, id_professor))
+
+
+
+#Escrever materia e id_curso em matriz curricular puxando da materia
+cursor.execute("SELECT id_materia, nome_departamento FROM MATERIA")
+materiaa = cursor.fetchall() #criar tupla com todos os dados da tabela
+
+
+# Atualizar a tabela de matérias com o departamento baseado no id do prof
+for _ in materiaa:
+    cursor.execute("UPDATE MATRIZ_CURRICULAR SET materia = %s WHERE id_materia = %s", (_[1], _[0]))
+
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'MA' WHERE materia = 'Matemática'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'FI' WHERE materia = 'Física'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'CC' WHERE materia = 'Ciência da Computação'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EE' WHERE materia = 'Engenharia Elétrica'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EM' WHERE materia = 'Engenharia Mecânica'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EQ' WHERE materia = 'Engenharia Química'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'AD' WHERE materia = 'Administração'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EP' WHERE materia = 'Engenharia de Produção' ")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EN' WHERE materia = 'Engenharia Nuclear' ")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'ET' WHERE materia = 'Engenharia Textil'")
+
+
+
 
 #Atualizar a tabela curso com departamento, nome e id
 cursor.execute("UPDATE CURSO SET nome_departamento = 'Matemática' WHERE id_curso = 'MA'")
@@ -231,3 +255,6 @@ for element in materias:
 
 #escrever os dados na tabela:
 conexao.commit()
+print("Sucesso")
+cursor.close()
+conexao.close()
