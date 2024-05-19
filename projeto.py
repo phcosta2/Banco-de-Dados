@@ -46,6 +46,13 @@ semestre = DynamicProvider(
     elements = ['Primeiro', 'Segundo' ,'Terceiro' ,'Quarto' ,'Quinto' ,'Sexto' ,'Sétimo' ,'Oitavo' ,'Nono' ,'Décimo']
 )
 
+lista_materias = []
+for i in range(60):
+    materia = random.randint(100000, 999999)
+    if materia not in lista_materias:
+        lista_materias.append(materia)
+
+
 # # Geracao de semestres do historico escolar de maneira aleatoria
 # semestre = DynamicProvider(
 #     provider_name="historico_escolar",
@@ -58,11 +65,11 @@ fake.add_provider(semestre)
 
 # valores chaves de variaveis para quando for criar valores ficticios
 primary_keys = {
-    "nome_departamento" : ["Matemática", "Física", "Ciência da Computação", "Engenharia Elétrica", "Engenharia Mecânica", "Engenharia Química", "Administração", "Engenharia de Produção", "Engenharia Nuclear", "Engenharia Textil"],
+    "nome_departamento" : ["Matemática", "Física", "Ciência da Computação", "Engenharia Elétrica", "Engenharia Mecânica"],
     "id_professor" : ["12.244.524-8", "12.244.785-4", "12.244.132-8", "12.244.512-4", "12.244.654-7", "12.244.368-2", "12.244.524-3", "12.244.952-4", "12.244.714-2", "12.244.518-4"],
     "id_aluno" : ['24.122.055-7', '24.122.027-6', '24.122.049-9','24.122.011-2','24.122.024-4','24.122.088-8','24.122.088-2', '24.122.099-9','24.122.011-1','24.122.000-1'],
-    "id_curso" : ['MA', 'FI', 'CC', 'EE', 'EM', 'EQ', 'AD', 'EP', 'EN', 'ET'],
-    "id_materia" : ['452645', '745234', '258452', '123254', '368475', '522147', '216352', '318756', '917832', '471253'],
+    "id_curso" : ['MA', 'FI', 'CC', 'EE', 'EM'],
+    "id_materia" : ['452645', '745234', '258452', '123254'],
 }
 
 #Criação das tabela de departamento:
@@ -77,11 +84,23 @@ for linha in range(len(primary_keys["id_professor"])):
 for linha in range(len(primary_keys["id_materia"])):
     cursor.execute("INSERT INTO MATERIA VALUES (%s, %s, %s,%s)", (primary_keys["id_materia"][linha], fake.materias(), fake.pybool(),random.choice(primary_keys["id_professor"])))
 
+
 #Criação da Tabela Curso:
 for linha in range(len(primary_keys["id_curso"])):
     cursor.execute("INSERT INTO CURSO VALUES (%s, %s, %s)", (primary_keys["id_curso"][linha] ,'Null', random.randint(160,300)))
 
+
 #Criação da tabela Matriz Curricular
+for linha in range(len(primary_keys["nome_departamento"])): 
+    for i in range(len(primary_keys["id_materia"])):
+        cursor.execute("INSERT INTO MATRIZ_CURRICULAR VALUES (%s,%s, %s)", (primary_keys["nome_departamento"][linha],primary_keys["id_curso"][linha],primary_keys["id_materia"][i]))
+
+matriz_keys = {    
+    
+}
+# Administração - Probabilidade
+# Admitração - gestao de projetos  
+
 
 
 #Criação das tabelas do TCC:
@@ -96,8 +115,8 @@ for linha in range(len(primary_keys["id_aluno"])):
 
 
 #Criação das tabelas Histórico Escolar
-for linha in range(len(primary_keys["id_aluno"])):
-    cursor.execute("INSERT INTO HISTORICO_ESCOLAR (nota, semestre, ano,id_aluno,id_materia) VALUES(%s,%s,%s,%s,%s)", (random.randint(0,10),fake.semestres(),random.randint(2000,2030),primary_keys["id_aluno"][linha],primary_keys["id_materia"][linha]))
+#for linha in range(len(primary_keys["id_aluno"])):
+#    cursor.execute("INSERT INTO HISTORICO_ESCOLAR (nota, semestre, ano,id_aluno,id_materia) VALUES(%s,%s,%s,%s,%s)", (random.randint(0,10),fake.semestres(),random.randint(2000,2030),primary_keys["id_aluno"][linha],primary_keys["id_materia"][linha]))
 
 #Criação da tabela Histórico Professor
 for linha in range(len(primary_keys["id_professor"])):

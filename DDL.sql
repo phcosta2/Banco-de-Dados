@@ -7,6 +7,13 @@ CREATE TABLE IF NOT EXISTS Departamento(
     chefe_departamento varchar(50)
 );
 
+CREATE TABLE IF NOT EXISTS Curso(
+    id_curso varchar(2) PRIMARY KEY,
+    nome_curso varchar(50),
+    horas_extras numeric(3),
+    nome_departamento varchar(50) REFERENCES Departamento(nome_departamento)
+);
+
 CREATE TABLE IF NOT EXISTS Professor(
     id_professor varchar(12) PRIMARY KEY,
     nome_professor varchar(50),
@@ -22,20 +29,10 @@ CREATE TABLE IF NOT EXISTS Materia(
     nome_departamento varchar(50) REFERENCES Departamento(nome_departamento)
 );
 
-CREATE TABLE IF NOT EXISTS Curso(
-    id_curso varchar(2) PRIMARY KEY,
-    nome_curso varchar(50),
-    horas_extras numeric(3),
-    nome_departamento varchar(50) REFERENCES Departamento(nome_departamento),
-    id_materia varchar(6) REFERENCES Materia(id_materia)
-);
-
 CREATE TABLE IF NOT EXISTS Matriz_Curricular(
-    semestre varchar(15),
-    ano numeric(4),
-    dia numeric(2),
-    id_materia varchar(6) REFERENCES Materia(id_materia),
-    id_curso varchar(2) REFERENCES Curso(id_curso)
+    materia varchar(50),
+    id_curso varchar(2) REFERENCES Curso(id_curso),
+    id_materia varchar(6) REFERENCES Materia(id_materia)
 );
 
 CREATE SEQUENCE sequencia_tcc START 1;  
