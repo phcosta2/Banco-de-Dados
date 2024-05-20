@@ -1,4 +1,4 @@
-# import de todas as bibliotecas utilizadas
+    # import de todas as bibliotecas utilizadas
 
 
 import psycopg2
@@ -53,13 +53,13 @@ semestre = DynamicProvider(
 lista_materias = [num for num in random.sample(range(100000, 999999), 60)]
 
 # Gera 100 números únicos entre 100000000 e 500000000 servir para os RAs dos alunos
-numeros_unicos = random.sample(range(100000000, 500000000), 100)
+ra_aluno = random.sample(range(100000000, 500000000), 10)
 # Gera 60 números únicos entre 500000001 e 999999999 servir para os RAs dos profesores
-numeros_unicos2 = random.sample(range(500000001, 999999999), 60)
+ra_professor = random.sample(range(500000001, 999999999), 10)
 # Formata os números no padrão xx.xxx.xxx-x e adicionar na lista com list compehension
-ids_aluno = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in numeros_unicos]
+ids_aluno = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in ra_aluno]
 # Formata os números no padrão xx.xxx.xxx-x e adicionar na lista com list compehension
-ids_prof = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in numeros_unicos2]
+ids_prof = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in ra_professor]
 
 lista_hist_escolar = [num for num in random.sample(range(1, 500000), 60)]
 
@@ -110,6 +110,7 @@ for linha in range(len(primary_keys["nome_departamento"])):
     fake.first_name()
     ))#TABELA COMPLETA
 
+
 # Criação das tabelas do Professor
 for linha in range(len(ids_prof)):
     cursor.execute("INSERT INTO PROFESSOR VALUES (%s, %s, %s,%s)", (
@@ -125,7 +126,7 @@ for linha in range(len(lista_materias)):
     lista_materias[linha], 
     fake.materias(), 
     fake.pybool(), 
-    ids_prof[random.randint(0, 59)]
+    ids_prof[random.randint(0, (len(ids_prof)-1))]
     ))#TABELA INCOMPLETA
 
 # PRECISA ESCREVER O NOME DE DEPARTAMENTO CORRETO NA MATÉRIA BASEADO NO QUE ESTA NA TABELA DO PROFESSOR
@@ -137,7 +138,7 @@ for _ in professores:
 
 #Criação da Tabela Curso:
 for linha in range(len(primary_keys["id_curso"])):
-    cursor.execute("INSERT INTO CURSO (id_curso, horas_complementares) VALUES (%s, %s)", (
+    cursor.execute("INSERT INTO CURSO (id_curso, horas_extras) VALUES (%s, %s)", (
     primary_keys["id_curso"][linha] ,
     random.randint(160,300)
     ))#TABELA INCOMPLETA
@@ -196,10 +197,10 @@ cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EN' WHERE materia = 'En
 cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'ET' WHERE materia = 'Engenharia Textil'")
 
 #Criação das tabelas do TCC: - precisa colocar titulos decentes
-for linha in range(100):
+for linha in range(len(ids_aluno)):
     cursor.execute("INSERT INTO TCC (titulo,id_professor) VALUES (%s,%s)", (
         "Título " + str(linha),
-          ids_prof[random.randint(0, 59)]
+          ids_prof[random.randint(0, (len(ids_prof)-1))]
           ))#TABELA COMPLETA
 
 #Criação das tabelas do Aluno:
@@ -224,7 +225,7 @@ for linha in range(len(ids_aluno)):
         string, 
         tabela_horas[string], 
         random.randint(4, 31), 
-        ids_aluno[random.randint(0, 99)]
+        ids_aluno[random.randint(0, (len(ids_aluno)-1))]
         ))
 
 #Criação das tabelas Histórico Escolar - PRECISA ARRUMAR - o mesmo aluno esta com ids de histotico diferentes, precisa ser igual
@@ -234,7 +235,7 @@ for linha in range(len(lista_hist_escolar)):
         random.randint(0,10),
         fake.semestres(), 
         random.randint(2000,2020), 
-        ids_aluno[random.randint(0, 99)], 
+        ids_aluno[random.randint(0, (len(ids_aluno)-1))], 
         lista_materias[random.randint(0, 59)]
         ))
 
@@ -243,7 +244,7 @@ for linha in range(len(lista_hist_professor)):
     cursor.execute("INSERT INTO HISTORICO_PROFESSOR (id_historico_professor, quantidade_aulas, id_professor) VALUES(%s, %s, %s)", (
         lista_hist_professor[linha], 
         random.randint(1, 100), 
-        ids_prof[random.randint(0, 59)]
+        ids_prof[random.randint(0, (len(ids_prof)-1))]
         ))
 # FAZER A RELAÇÃO HISTORIO DO PROF COM ID PROFESSOR
 
@@ -256,6 +257,40 @@ for linha in range(len(lista_hist_professor)):
 
 
 #escrever os dados na tabela:
+
+
+
+
+
+# criacao das queries
+# 1- histórico escolar de qualquer aluno, retornando o código e nome da disciplina, semestre e ano que a disciplina foi cursada e nota final
+# 2- histórico de disciplinas ministradas por qualquer professor, com semestre e ano
+# 3- listar alunos que já se formaram (foram aprovados em todos os cursos de uma matriz curricular) em um determinado semestre de um ano
+
+
+# 4- listar todos os professores que são chefes de departamento, junto com o nome do departamento
+cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", ('Astrofisica', 'Julia'))
+cursor.execute("INSERT INTO PROFESSOR VALUES (%s, %s, %s, %s)", ('12.456.789-0', 'Julia', 25000, 'Astrofisica'))
+query4 = """
+    CREATE VIEW query4 AS
+        SELECT p.nome_professor, d.nome_departamento
+        FROM professor p
+        INNER JOIN departamento d ON p.nome_departamento = d.nome_departamento
+        WHERE p.nome_professor = d.chefe_departamento
+"""
+cursor.execute(query4)
+# 5- saber quais alunos formaram um grupo de TCC e qual professor foi o orientador
+query5 = """
+    CREATE VIEW query5 AS
+        SELECT a.nome_aluno, p.nome_professor
+        FROM aluno a
+        INNER JOIN tcc t ON t.id_tcc = a.id_tcc 
+        INNER JOIN professor p ON p.id_professor = t.id_professor
+"""
+cursor.execute(query5)
+
+
+
 conexao.commit()
 print("Sucesso")
 cursor.close()
