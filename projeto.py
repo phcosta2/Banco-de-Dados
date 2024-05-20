@@ -1,9 +1,12 @@
 # import de todas as bibliotecas utilizadas
+
+
 import psycopg2
 import json
 from faker import Faker
 from faker.providers import DynamicProvider
 import random
+
 with open('acess.json') as file:
     config = json.load(file)
 
@@ -46,45 +49,24 @@ semestre = DynamicProvider(
     elements = ['Primeiro', 'Segundo' ,'Terceiro' ,'Quarto' ,'Quinto' ,'Sexto' ,'Sétimo' ,'Oitavo' ,'Nono' ,'Décimo']
 )
 
-lista_materias = []
-for i in range(60):
-    materia = random.randint(100000, 999999)
-    if materia not in lista_materias:
-        lista_materias.append(materia)
 
+lista_materias = [num for num in random.sample(range(100000, 999999), 60)]
 
-# adicionando RA's de alunos aleatoriamente e concatenando eles posteriormente
-aux_ids_aluno = []
-ids_aluno = []
+# Gera 100 números únicos entre 100000000 e 500000000 servir para os RAs dos alunos
+numeros_unicos = random.sample(range(100000000, 500000000), 100)
+# Gera 60 números únicos entre 500000001 e 999999999 servir para os RAs dos profesores
+numeros_unicos2 = random.sample(range(500000001, 999999999), 60)
+# Formata os números no padrão xx.xxx.xxx-x e adicionar na lista com list compehension
+ids_aluno = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in numeros_unicos]
+# Formata os números no padrão xx.xxx.xxx-x e adicionar na lista com list compehension
+ids_prof = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in numeros_unicos2]
 
-for i in range(100):
-    num = random.randint(100000000, 500000000)
-    if num not in aux_ids_aluno:
-        aux_ids_aluno.append(str(num))
+lista_hist_escolar = [num for num in random.sample(range(1, 500000), 60)]
 
-for id in aux_ids_aluno:
-    id = id[0:2] + '.' + id[2:5] + '.' + id[5:8] + '-' + id[8]
-    ids_aluno.append(id)
-
-# adicionando RA's de professores aleatoriamente e concatenando eles posteriormente
-aux_ids_prof = []
-ids_prof = []
-
-for i in range(60):
-    num = random.randint(500000001, 999999999)
-    if num not in aux_ids_prof:
-        aux_ids_prof.append(str(num))
-
-for id in aux_ids_prof:
-    id = id[0:2] + '.' + id[2:5] + '.' + id[5:8] + '-' + id[8]
-    ids_prof.append(id)
+lista_hist_professor = [num for num in random.sample(range(500001, 999999), 60)]
 
 print('inicialização das listas')
-# # Geracao de semestres do historico escolar de maneira aleatoria
-# semestre = DynamicProvider(
-#     provider_name="historico_escolar",
-#     elements = ['Primeiro', 'Segundo' ,'Terceiro' ,'Quarto' ,'Quinto' ,'Sexto' ,'Sétimo' ,'Oitavo' ,'Nono' ,'Décimo']
-# )
+
 
 #inicialização dos providers:
 fake.add_provider(nome_materia)
@@ -93,8 +75,6 @@ fake.add_provider(semestre)
 # valores chaves de variaveis para quando for criar valores ficticios
 primary_keys = {
     "nome_departamento" : ["Matemática", "Física", "Ciência da Computação", "Engenharia Elétrica", "Engenharia Mecânica"],
-     "id_professor" : ["12.244.524-8", "12.244.785-4", "12.244.132-8", "12.244.512-4", "12.244.654-7", "12.244.368-2", "12.244.524-3", "12.244.952-4", "12.244.714-2", "12.244.518-4"],
-     "id_aluno" : ['24.122.055-7', '24.122.027-6', '24.122.049-9','24.122.011-2','24.122.024-4','24.122.088-8','24.122.088-2', '24.122.099-9','24.122.011-1','24.122.000-1'],
     "id_curso" : ['MA', 'FI', 'CC', 'EE', 'EM'],
      "id_materia" : ['452645', '745234', '258452', '123254', '123456', '545236'],
 }
@@ -125,86 +105,44 @@ tabela_horas = {
 
 #Criação das tabela de departamento:
 for linha in range(len(primary_keys["nome_departamento"])):
-    cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", (primary_keys["nome_departamento"][linha],  fake.first_name()))
+    cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", (
+    primary_keys["nome_departamento"][linha],
+    fake.first_name()
+    ))#TABELA COMPLETA
 
 # Criação das tabelas do Professor
 for linha in range(len(ids_prof)):
-    cursor.execute("INSERT INTO PROFESSOR VALUES (%s, %s, %s,%s)", (ids_prof[linha], fake.first_name(), random.randint(2000,20000),random.choice(primary_keys["nome_departamento"])))
+    cursor.execute("INSERT INTO PROFESSOR VALUES (%s, %s, %s,%s)", (
+    ids_prof[linha], 
+    fake.first_name(), 
+    random.randint(2000,20000),
+    random.choice(primary_keys["nome_departamento"])
+    ))#TABELA COMPLETA
 
 #Criação das tabelas da Materia:
 for linha in range(len(lista_materias)):
-    cursor.execute("INSERT INTO MATERIA VALUES (%s, %s, %s,%s)", (lista_materias[linha], fake.materias(), fake.pybool(), ids_prof[random.randint(0, 59)]))
-# primary_keys["id_materia"][linha]
+    cursor.execute("INSERT INTO MATERIA VALUES (%s, %s, %s,%s)", (
+    lista_materias[linha], 
+    fake.materias(), 
+    fake.pybool(), 
+    ids_prof[random.randint(0, 59)]
+    ))#TABELA INCOMPLETA
+
+# PRECISA ESCREVER O NOME DE DEPARTAMENTO CORRETO NA MATÉRIA BASEADO NO QUE ESTA NA TABELA DO PROFESSOR
+cursor.execute("SELECT id_professor, nome_departamento FROM PROFESSOR")
+professores = cursor.fetchall() 
+for _ in professores:
+    cursor.execute("UPDATE MATERIA SET nome_departamento = %s WHERE id_professor = %s", (_[1], _[0]))
+
 
 #Criação da Tabela Curso:
 for linha in range(len(primary_keys["id_curso"])):
-    cursor.execute("INSERT INTO CURSO VALUES (%s, %s, %s)", (primary_keys["id_curso"][linha] ,'Null', random.randint(160,300)))
-
-
-#Criação da tabela Matriz Curricular
-for materia in lista_materias:
-    cursor.execute("INSERT INTO MATRIZ_CURRICULAR (id_materia) VALUES (%s)", (str(materia),))
-
-
-#Criação das tabelas do TCC: - precisa colocar titulos decentes
-for linha in range(100):
-    cursor.execute("INSERT INTO TCC (titulo,id_professor) VALUES (%s,%s)", ("Título " + str(linha), ids_prof[random.randint(0, 59)]))
-
-#Criação das tabelas do Aluno:
-for linha in range(len(ids_aluno)):
-    cursor.execute("INSERT INTO ALUNO (id_aluno, nome_aluno, idade_aluno, id_curso, id_tcc) VALUES (%s, %s, %s, %s, %s)", (ids_aluno[linha], fake.first_name(), random.randint(18,65), primary_keys["id_curso"][random.randint(0, 4)], (linha + 1)))
-
-
-#Criação da tabela de Horas Complementares
-for linha in range(len(ids_aluno)):
-    aux = random.randint(1, 20)
-    string = 'A' + str(aux)
-    cursor.execute("INSERT INTO HORAS_COMPLEMENTARES (id_horas, descricao, horas_extras, id_aluno) VALUES (%s, %s, %s, %s)", (string, tabela_horas[string], random.randint(4, 31), ids_aluno[random.randint(0, 99)]))
-
-#Criação das tabelas Histórico Escolar - PRECISA ARRUMAR - o mesmo aluno esta com ids de histotico diferentes, precisa ser igual
-for linha in range(100):
-   cursor.execute("INSERT INTO HISTORICO_ESCOLAR (nota, semestre, ano,id_aluno,id_materia) VALUES(%s,%s,%s,%s,%s)", (random.randint(0,10), fake.semestres(), random.randint(2000,2020), ids_aluno[random.randint(0, 99)], lista_materias[random.randint(0, 59)]))
-
-#Criação da tabela Histórico Professor - PRECISA ARRUMAR o mesmo professor esta com ids de histotico diferentes, precisa ser igual e a meteria que ele esta dando no momento nao esta indo para o historico de materias dadas por ele
-for linha in range(100):
-    cursor.execute("INSERT INTO HISTORICO_PROFESSOR (semestre, ano, quantidade_aulas, id_professor, id_materia) VALUES(%s, %s, %s, %s, %s)", (fake.semestres(), random.randint(2000, 2020), random.randint(1, 100), ids_prof[random.randint(0, 59)], lista_materias[random.randint(0, 59)]))
-
-#Escrever o nome de departamento da tabela professor
-cursor.execute("SELECT id_professor, nome_departamento FROM PROFESSOR")
-professores = cursor.fetchall() #criar tupla com todos os dados da tabela
-
-
-# Atualizar a tabela de matérias com o departamento baseado no id do prof
-for professor in professores:
-    id_professor = professor[0]
-    departamento_professor = professor[1]
-    cursor.execute("UPDATE MATERIA SET nome_departamento = %s WHERE id_professor = %s", (departamento_professor, id_professor))
-
-
-
-#Escrever materia e id_curso em matriz curricular puxando da materia
-cursor.execute("SELECT id_materia, nome_departamento FROM MATERIA")
-materiaa = cursor.fetchall() #criar tupla com todos os dados da tabela
-
-
-# Atualizar a tabela de matérias com o departamento baseado no id do prof
-for _ in materiaa:
-    cursor.execute("UPDATE MATRIZ_CURRICULAR SET materia = %s WHERE id_materia = %s", (_[1], _[0]))
-
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'MA' WHERE materia = 'Matemática'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'FI' WHERE materia = 'Física'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'CC' WHERE materia = 'Ciência da Computação'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EE' WHERE materia = 'Engenharia Elétrica'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EM' WHERE materia = 'Engenharia Mecânica'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EQ' WHERE materia = 'Engenharia Química'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'AD' WHERE materia = 'Administração'")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EP' WHERE materia = 'Engenharia de Produção' ")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EN' WHERE materia = 'Engenharia Nuclear' ")
-cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'ET' WHERE materia = 'Engenharia Textil'")
-
-
-
-
+    cursor.execute("INSERT INTO CURSO (id_curso, horas_complementares) VALUES (%s, %s)", (
+    primary_keys["id_curso"][linha] ,
+    random.randint(160,300)
+    ))#TABELA INCOMPLETA
+#FALTOU NOME DO CURSO E NOME DO DEPARTAMENTO
+#1) 
 #Atualizar a tabela curso com departamento, nome e id
 cursor.execute("UPDATE CURSO SET nome_departamento = 'Matemática' WHERE id_curso = 'MA'")
 cursor.execute("UPDATE CURSO SET nome_departamento = 'Física' WHERE id_curso = 'FI'")
@@ -230,28 +168,92 @@ cursor.execute("UPDATE CURSO SET nome_curso = 'Engenharia Nuclear' WHERE NOME_DE
 cursor.execute("UPDATE CURSO SET nome_curso = 'Engenharia Textil' WHERE NOME_DEPARTAMENTO = 'Engenharia Textil'")
 
 
-#Escrever o nome de departamento da tabela professor
-#cursor.execute("SELECT id_materia, id_professor FROM MATERIA")
-#materias = cursor.fetchall() #criar tupla com todos os dados da tabela
+
+#Criação da tabela Matriz Curricular
+for materia in lista_materias:
+    cursor.execute("INSERT INTO MATRIZ_CURRICULAR (id_materia) VALUES (%s)", (
+        str(materia),
+        ))#TABELA INCOMPLETA
+
+# PRECISA ESCREVER O NOME DO DEPARTAMENTO BASEADO NO ID_MATERIA PRESENTE EM MATERIA
 
 # Atualizar a tabela de matérias com o departamento baseado no id do prof
-#for materia in materias:
-#    id_materia = materia[0]
-#    id_professor = materia[1]
-#    cursor.execute("UPDATE HISTORICO_PROFESSOR SET id_materia_atual = %s WHERE id_professor = %s", (id_materia, id_professor))
-
-
-
-
-'''
+#Escrever materia e id_curso em matriz curricular puxando da materia
 cursor.execute("SELECT id_materia, nome_departamento FROM MATERIA")
-materias = cursor.fetchall() #criar tupla com todos os dados da tabela
-for element in materias:
-    print (element)
-    id_mat = element[0]
-    departamento_materia = element[1]
-    cursor.execute("UPDATE CURSO SET id_materia = %s WHERE nome_departamento = %s", (id_mat, departamento_materia))
-'''
+materiaa = cursor.fetchall() #criar tupla com todos os dados da tabela
+for _ in materiaa:
+    cursor.execute("UPDATE MATRIZ_CURRICULAR SET materia = %s WHERE id_materia = %s", (_[1], _[0]))
+
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'MA' WHERE materia = 'Matemática'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'FI' WHERE materia = 'Física'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'CC' WHERE materia = 'Ciência da Computação'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EE' WHERE materia = 'Engenharia Elétrica'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EM' WHERE materia = 'Engenharia Mecânica'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EQ' WHERE materia = 'Engenharia Química'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'AD' WHERE materia = 'Administração'")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EP' WHERE materia = 'Engenharia de Produção' ")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'EN' WHERE materia = 'Engenharia Nuclear' ")
+cursor.execute("UPDATE MATRIZ_CURRICULAR SET id_curso = 'ET' WHERE materia = 'Engenharia Textil'")
+
+#Criação das tabelas do TCC: - precisa colocar titulos decentes
+for linha in range(100):
+    cursor.execute("INSERT INTO TCC (titulo,id_professor) VALUES (%s,%s)", (
+        "Título " + str(linha),
+          ids_prof[random.randint(0, 59)]
+          ))#TABELA COMPLETA
+
+#Criação das tabelas do Aluno:
+for linha in range(len(ids_aluno)):
+    cursor.execute("INSERT INTO ALUNO (id_aluno, nome_aluno, idade_aluno, id_curso, id_tcc) VALUES (%s, %s, %s, %s, %s)", (
+        ids_aluno[linha], 
+        fake.first_name(), 
+        random.randint(18,65),
+        primary_keys["id_curso"][random.randint(0, 4)], 
+        (linha + 1)
+        ))#TABELA COMPLETA
+  
+
+#<VERIFICADO ATÉ ESSE PONTO por Pedro>
+
+
+#Criação da tabela de Horas Complementares
+for linha in range(len(ids_aluno)):
+    aux = random.randint(1, 20)
+    string = 'A' + str(aux)
+    cursor.execute("INSERT INTO HORAS_COMPLEMENTARES (id_horas, descricao, horas_extras, id_aluno) VALUES (%s, %s, %s, %s)", (
+        string, 
+        tabela_horas[string], 
+        random.randint(4, 31), 
+        ids_aluno[random.randint(0, 99)]
+        ))
+
+#Criação das tabelas Histórico Escolar - PRECISA ARRUMAR - o mesmo aluno esta com ids de histotico diferentes, precisa ser igual
+for linha in range(len(lista_hist_escolar)):
+    cursor.execute("INSERT INTO HISTORICO_ESCOLAR (id_historico_escolar, nota, semestre, ano, id_aluno, id_materia) VALUES(%s, %s, %s, %s, %s, %s)", (
+        lista_hist_escolar[linha],
+        random.randint(0,10),
+        fake.semestres(), 
+        random.randint(2000,2020), 
+        ids_aluno[random.randint(0, 99)], 
+        lista_materias[random.randint(0, 59)]
+        ))
+
+#Criação da tabela Histórico Professor - PRECISA ARRUMAR o mesmo professor esta com ids de histotico diferentes, precisa ser igual e a meteria que ele esta dando no momento nao esta indo para o historico de materias dadas por ele
+for linha in range(len(lista_hist_professor)):
+    cursor.execute("INSERT INTO HISTORICO_PROFESSOR (id_historico_professor, quantidade_aulas, id_professor) VALUES(%s, %s, %s)", (
+        lista_hist_professor[linha], 
+        random.randint(1, 100), 
+        ids_prof[random.randint(0, 59)]
+        ))
+# FAZER A RELAÇÃO HISTORIO DO PROF COM ID PROFESSOR
+
+#PROCURAR NA TABELA MATERIA O ID DA MATERIA QUE O ID DO PROF DA
+
+
+# O QUE FALTA:
+# atualizar o id do historico escolar para ser igual quando repete o numero de ra do aluno
+# atualizar o id do historico professor para ser igual quando repete o numero de ra do professor
+
 
 #escrever os dados na tabela:
 conexao.commit()
