@@ -1,4 +1,4 @@
-    # import de todas as bibliotecas utilizadas
+# import de todas as bibliotecas utilizadas
 
 
 import psycopg2
@@ -234,29 +234,22 @@ for linha in range(len(lista_hist_escolar)):
         lista_hist_escolar[linha],
         random.randint(0,10),
         fake.semestres(), 
-        random.randint(2000,2020), 
+        2020, #random.randint(2000,2020), 
         ids_aluno[random.randint(0, (len(ids_aluno)-1))], 
-        lista_materias[random.randint(0, 59)]
+        lista_materias[random.randint(0, (len(lista_materias)-1))]
         ))
 
 #Criação da tabela Histórico Professor - PRECISA ARRUMAR o mesmo professor esta com ids de histotico diferentes, precisa ser igual e a meteria que ele esta dando no momento nao esta indo para o historico de materias dadas por ele
 for linha in range(len(lista_hist_professor)):
-    cursor.execute("INSERT INTO HISTORICO_PROFESSOR (id_historico_professor, quantidade_aulas, id_professor) VALUES(%s, %s, %s)", (
-        lista_hist_professor[linha], 
+    cursor.execute("INSERT INTO HISTORICO_PROFESSOR (id_historico_professor, semestre, ano, quantidade_aulas, id_professor, id_materia) VALUES(%s, %s, %s, %s, %s, %s)", (
+        lista_hist_professor[linha],
+        fake.semestres(),
+        2020, #random.randint(2000, 2020), 
         random.randint(1, 100), 
-        ids_prof[random.randint(0, (len(ids_prof)-1))]
+        ids_prof[random.randint(0, (len(ids_prof)-1))],
+        lista_materias[random.randint(0, (len(lista_materias)-1))]
         ))
-# FAZER A RELAÇÃO HISTORIO DO PROF COM ID PROFESSOR
 
-#PROCURAR NA TABELA MATERIA O ID DA MATERIA QUE O ID DO PROF DA
-
-
-# O QUE FALTA:
-# atualizar o id do historico escolar para ser igual quando repete o numero de ra do aluno
-# atualizar o id do historico professor para ser igual quando repete o numero de ra do professor
-
-
-#escrever os dados na tabela:
 
 
 
@@ -264,30 +257,102 @@ for linha in range(len(lista_hist_professor)):
 
 # criacao das queries
 # 1- histórico escolar de qualquer aluno, retornando o código e nome da disciplina, semestre e ano que a disciplina foi cursada e nota final
-# 2- histórico de disciplinas ministradas por qualquer professor, com semestre e ano
-# 3- listar alunos que já se formaram (foram aprovados em todos os cursos de uma matriz curricular) em um determinado semestre de um ano
+# query1 = """
+#     CREATE VIEW query1 AS
+#         SELECT m.id_materia, m.nome_materia, he.semestre, he.ano, he.nota 
+#         FROM historico_escolar he
+#         INNER JOIN materia m ON he.id_materia = m.id_materia
+# """
+# cursor.execute(query1)
 
+# query1_1 = """
+#     CREATE VIEW query1_1 AS
+#         WITH qualquer_pessoa AS (
+#             SELECT nome_aluno
+#             FROM aluno
+#             ORDER BY RANDOM()
+#             LIMIT 1
+#         )
+#         SELECT a.nome_aluno, m.id_materia, m.nome_materia, he.semestre, he.ano, he.nota 
+#         FROM historico_escolar he
+#         INNER JOIN materia m ON he.id_materia = m.id_materia
+#         INNER JOIN aluno a ON a.id_aluno = he.id_aluno
+#         WHERE a.nome_aluno = (
+#             SELECT nome_aluno
+#             FROM qualquer_pessoa
+#         )
+# """
+# cursor.execute(query1_1)
 
-# 4- listar todos os professores que são chefes de departamento, junto com o nome do departamento
+# # 2- histórico de disciplinas ministradas por qualquer professor, com semestre e ano
+# query2 = """
+#     CREATE VIEW query2 AS 
+#         WITH qualquer_professor AS (
+#             SELECT nome_professor
+#             FROM professor
+#             ORDER BY RANDOM()
+#             LIMIT 1
+#         )
+#         SELECT p.nome_professor, hp.id_materia, hp.semestre, hp.ano
+#         FROM professor p 
+#         INNER JOIN historico_professor hp ON p.id_professor = hp.id_professor
+#         WHERE p.nome_professor = (
+#             SELECT nome_professor
+#             FROM qualquer_professor
+#         )
+# """
+# cursor.execute(query2)
+
+# # 3- listar alunos que já se formaram (foram aprovados em todos os cursos de uma matriz curricular) em um determinado semestre de um ano
+# query3 = """
+#     CREATE VIEW query3 AS
+#         WITH qualquer AS (
+#             SELECT semestre, ano
+#             FROM historico_escolar
+#             ORDER BY RANDOM()
+#             LIMIT 1
+#         )
+#         SELECT a.nome_aluno, c.nome_curso, c.id_curso, he.nota, he.semestre, he.ano
+#         FROM aluno a
+#         INNER JOIN curso c ON a.id_curso = c.id_curso
+#         INNER JOIN historico_escolar he ON a.id_aluno = he.id_aluno 
+#         WHERE he.semestre = (
+#             SELECT semestre
+#             FROM qualquer
+#         ) AND he.ano = (
+#             SELECT ano
+#             FROM qualquer
+#         ) AND he.nota >= 5
+# """
+# cursor.execute(query3)
+
+# # 4- listar todos os professores que são chefes de departamento, junto com o nome do departamento
 cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", ('Astrofisica', 'Julia'))
 cursor.execute("INSERT INTO PROFESSOR VALUES (%s, %s, %s, %s)", ('12.456.789-0', 'Julia', 25000, 'Astrofisica'))
-query4 = """
-    CREATE VIEW query4 AS
-        SELECT p.nome_professor, d.nome_departamento
-        FROM professor p
-        INNER JOIN departamento d ON p.nome_departamento = d.nome_departamento
-        WHERE p.nome_professor = d.chefe_departamento
-"""
-cursor.execute(query4)
-# 5- saber quais alunos formaram um grupo de TCC e qual professor foi o orientador
-query5 = """
-    CREATE VIEW query5 AS
-        SELECT a.nome_aluno, p.nome_professor
-        FROM aluno a
-        INNER JOIN tcc t ON t.id_tcc = a.id_tcc 
-        INNER JOIN professor p ON p.id_professor = t.id_professor
-"""
-cursor.execute(query5)
+# query4 = """
+#     CREATE VIEW query4 AS
+#         SELECT p.nome_professor, d.nome_departamento
+#         FROM professor p
+#         INNER JOIN departamento d ON p.nome_departamento = d.nome_departamento
+#         WHERE p.nome_professor = d.chefe_departamento
+# """
+# cursor.execute(query4)
+
+# # 5- saber quais alunos formaram um grupo de TCC e qual professor foi o orientador
+# query5 = """
+#     CREATE VIEW query5 AS
+#         SELECT a.nome_aluno, p.nome_professor
+#         FROM aluno a
+#         INNER JOIN tcc t ON t.id_tcc = a.id_tcc 
+#         INNER JOIN professor p ON p.id_professor = t.id_professor
+# """
+# cursor.execute(query5)
+
+with open("query.sql", "r") as sql_file:
+    sql_script = sql_file.read()
+
+# executar o SQL script
+cursor.execute(sql_script)
 
 
 
