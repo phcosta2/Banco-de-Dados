@@ -1,3 +1,4 @@
+--1- histórico escolar de qualquer aluno, retornando o código e nome da disciplina, semestre e ano que a disciplina foi cursada e nota final
 CREATE VIEW query1 AS
     WITH qualquer_pessoa AS (
         SELECT nome_aluno
@@ -14,6 +15,7 @@ CREATE VIEW query1 AS
         FROM qualquer_pessoa
     );
 
+--2- histórico de disciplinas ministradas por qualquer professor, com semestre e ano
 CREATE VIEW query2 AS 
     WITH qualquer_professor AS (
         SELECT nome_professor
@@ -29,6 +31,7 @@ CREATE VIEW query2 AS
         FROM qualquer_professor
     );
 
+--3- listar alunos que já se formaram (foram aprovados em todos os cursos de uma matriz curricular) em um determinado semestre de um ano
 CREATE VIEW query3 AS
     WITH qualquer AS (
         SELECT semestre, ano
@@ -48,12 +51,14 @@ CREATE VIEW query3 AS
         FROM qualquer
     ) AND he.nota >= 5;
 
+--4- listar todos os professores que são chefes de departamento, junto com o nome do departamento
 CREATE VIEW query4 AS
     SELECT p.nome_professor, d.nome_departamento
     FROM professor p
     INNER JOIN departamento d ON p.nome_departamento = d.nome_departamento
     WHERE p.nome_professor = d.chefe_departamento;
 
+--5- saber quais alunos formaram um grupo de TCC e qual professor foi o orientador
 CREATE VIEW query5 AS
     SELECT a.nome_aluno, p.nome_professor
     FROM aluno a
