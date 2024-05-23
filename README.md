@@ -13,7 +13,7 @@ Pedro Henrique Lega Kramer Costa R.A.: 24.122.049-0
 
 # Passos para executar o programa
 - Antes de fazer o download do arquivo zip do projeto, deve-se primeiro, fazer a instalação das bibliotecas ```psycopg2``` e ```Faker```.
-- Criar um ```acess.json``` com as seguintes instruções:
+- Criar um ```acess.json``` com as seguintes instruções (o nome do ```database``` deve ser "projeto"):
 
 ![image](https://github.com/jvgoverna/Projeto-Banco-de-Dados/blob/main/Imagem%20do%20acess%20do%20json.png)
 
