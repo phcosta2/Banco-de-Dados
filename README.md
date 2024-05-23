@@ -2,9 +2,9 @@
  Projetar uma faculdade utilizando banco de dados para salvar os dados.
 
 # Integrantes
-João Vitor Governatore R.A.: 24.122.027-6
-
 Felipe Orlando Lanzara R.A.: 24.122.055-7
+
+João Vitor Governatore R.A.: 24.122.027-6
 
 Pedro Henrique Lega Kramer Costa R.A.: 24.122.049-0
 
