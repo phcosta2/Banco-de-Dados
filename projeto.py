@@ -1,6 +1,4 @@
 # import de todas as bibliotecas utilizadas
-
-
 import psycopg2
 import json
 from faker import Faker
@@ -10,7 +8,6 @@ import random
 # Ler os dados do arquivo.json (database,user,password,host,port) e armazená-los na variável config
 with open('acess.json') as file:
     config = json.load(file)
-
 
 # passar os dados do banco para variaveis
 conexao = psycopg2.connect(
@@ -31,9 +28,6 @@ with open("DDL.sql", "r") as sql_file:
 # executar o SQL script
 cursor.execute(sql_script)
 
-
-#Criação dos dados nas tabelas:
-
 print('Leitura de dados')
 ##criacao da instancia do Faker para pt-br
 fake = Faker('pt-br')
@@ -50,22 +44,22 @@ semestre = DynamicProvider(
     elements = ['Primeiro', 'Segundo' ,'Terceiro' ,'Quarto' ,'Quinto' ,'Sexto' ,'Sétimo' ,'Oitavo']
 )
 
-
+# gera aleatoriamente e sem repetir o codigo das materias (60)
 lista_materias = [num for num in random.sample(range(100000, 999999), 60)]
-
-# Gera 100 números únicos entre 100000000 e 500000000 servir para os RAs dos alunos
+# gera aleatoriamente e sem repetir o RA dos alunos (50)
 ra_aluno = random.sample(range(100000000, 500000000), 50)
-# Gera 60 números únicos entre 500000001 e 999999999 servir para os RAs dos profesores
+# gera aleatoriamente e sem repetir o RA dos professores (20)
 ra_professor = random.sample(range(500000001, 999999999), 20)
 # Formata os números no padrão xx.xxx.xxx-x e adicionar na lista com list compehension
 ids_aluno = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in ra_aluno]
 # Formata os números no padrão xx.xxx.xxx-x e adicionar na lista com list compehension
 ids_prof = [f"{str(num)[:2]}.{str(num)[2:5]}.{str(num)[5:8]}-{str(num)[8]}" for num in ra_professor]
-
+# gera aleatoriamente e sem repetir a lista de historico escolar dos alunos (60)
 lista_hist_escolar = [num for num in random.sample(range(1, 500000), 60)]
-
+# gera aleatoriamente e sem repetir a lista do historico dos professores (60)
 lista_hist_professor = [num for num in random.sample(range(500001, 999999), 60)]
 
+# testar a inicializacao do codigo
 print('inicialização das listas')
 
 #inicialização dos providers:
@@ -78,7 +72,8 @@ primary_keys = {
     "id_curso" : ['MA', 'FI', 'CC', 'EE', 'EM'],
      "id_materia" : ['452645', '745234', '258452', '123254', '123456', '545236'],
 }
-# criacao da tabelas das horas complementares - id_horas : descricao
+
+# criacao da tabela das horas complementares - id_horas : descricao
 tabela_horas = {
     "A1" : "Vistas técnicas monitoras com plano previamente aprovado(empresas, industrias, férias, exposições)",
     "A2" : "Participação como ouvinte em eventos técnico-científicos na área de conhecimento do curso (congresso, seminário, oficina e outros eventos de mesma natureza).", 
@@ -127,7 +122,8 @@ for linha in range(len(lista_materias)):
     fake.pybool(), 
     ids_prof[random.randint(0, (len(ids_prof)-1))]
     ))
-# PRECISA ESCREVER O NOME DE DEPARTAMENTO CORRETO NA MATÉRIA BASEADO NO QUE ESTA NA TABELA DO PROFESSOR
+    
+# atualizar o nome do departamento na tabela materia de acordo com o id do professor
 cursor.execute("SELECT id_professor, nome_departamento FROM PROFESSOR")
 professores = cursor.fetchall() 
 for _ in professores:
@@ -168,7 +164,7 @@ cursor.execute("UPDATE CURSO SET nome_curso = 'Engenharia Textil' WHERE NOME_DEP
 for materia in lista_materias:
     cursor.execute("INSERT INTO MATRIZ_CURRICULAR (id_materia) VALUES (%s)", (
         str(materia),
-        ))#TABELA INCOMPLETA
+        ))
 
 #Atualizar a tabela de matérias com o departamento baseado no id do prof
 #Escrever materia e id_curso em matriz curricular puxando da materia
@@ -216,7 +212,7 @@ for linha in range(len(ids_aluno)):
         ids_aluno[random.randint(0, (len(ids_aluno)-1))]
         ))
 
-#Criação das tabelas Histórico Escolar - PRECISA ARRUMAR - o mesmo aluno esta com ids de histotico diferentes, precisa ser igual
+#Criação das tabelas Histórico Escolar
 for linha in range(len(lista_hist_escolar)):
     cursor.execute("INSERT INTO HISTORICO_ESCOLAR (id_historico_escolar, nota, semestre, ano, id_aluno, id_materia) VALUES(%s, %s, %s, %s, %s, %s)", (
         lista_hist_escolar[linha],
@@ -227,7 +223,7 @@ for linha in range(len(lista_hist_escolar)):
         lista_materias[random.randint(0, (len(lista_materias)-1))]
         ))
 
-#Criação da tabela Histórico Professor - PRECISA ARRUMAR o mesmo professor esta com ids de histotico diferentes, precisa ser igual e a meteria que ele esta dando no momento nao esta indo para o historico de materias dadas por ele
+#Criação da tabela Histórico Professor
 for linha in range(len(lista_hist_professor)):
     cursor.execute("INSERT INTO HISTORICO_PROFESSOR (id_historico_professor, semestre, ano, quantidade_aulas, id_professor, id_materia) VALUES(%s, %s, %s, %s, %s, %s)", (
         lista_hist_professor[linha],
@@ -242,12 +238,14 @@ for linha in range(len(lista_hist_professor)):
 cursor.execute("INSERT INTO DEPARTAMENTO VALUES (%s, %s)", ('Astrofisica', 'Julia'))
 cursor.execute("INSERT INTO PROFESSOR VALUES (%s, %s, %s, %s)", ('12.456.789-0', 'Julia', 25000, 'Astrofisica'))
 
+# ler o arquivo das querys criadas, alem de executa-lo
 with open("query.sql", "r") as sql_file:
     sql_script = sql_file.read()
 
 # executar o SQL script
 cursor.execute(sql_script)
 
+# commitar (salvar no banco), printar que deu certo e encerrar conexao
 conexao.commit()
 print("Sucesso")
 cursor.close()
